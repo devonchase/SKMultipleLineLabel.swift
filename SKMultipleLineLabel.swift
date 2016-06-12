@@ -57,24 +57,31 @@ class SKMultipleLineLabel: SKNode {
             
             var tempLineList : [String] = []
             var tempLine = ""
-                
+            
             for word in words! {
                     
                 let text = SKLabelNode(text: word)
+                
+                //This if statement generates the line
                 if text.frame.width < parWidth  && lineWidth < parWidth{
-//                    tempLineList.append(word)
                     tempLine = "\(tempLine) \(word)"
                     words?.removeFirst()
                     lineWidth = lineWidth + SKLabelNode(text: tempLine as String).frame.width
+                    
+                    //only call this on the last line since most likely it will fall in this if
+                    if words!.count == 0{
+                        tempLineList.append(tempLine)
+                    }
+                    
                 } else if lineWidth >= parWidth{
-                    //tempLineList.removeLast()
+                    //this else if adds the line to the tempLineList
+                    //and resets values
                     tempLineList.append(tempLine)
                     lineWidth = 0
                     tempLine = ""
-                    
                     //so the first word in the new line isn't lost
+                    //only should run once
                     if text.frame.width < parWidth  && lineWidth < parWidth{
-                        //                    tempLineList.append(word)
                         tempLine = "\(tempLine) \(word)"
                         words?.removeFirst()
                         lineWidth = lineWidth + SKLabelNode(text: tempLine as String).frame.width
@@ -82,21 +89,33 @@ class SKMultipleLineLabel: SKNode {
                 }
                 
             }
-   
+            
+            var counter  = 0
+            
             for line in tempLineList {
-                var counter = 1
-                var newLine = SKLabelNode(text: line)
+                
+                let newLine = SKLabelNode(text: line)
 //                newLine.verticalAlignmentMode = .Top
 //                newLine.horizontalAlignmentMode = .Left
-                
 //                newLine.position = CGPointMake(parentNode., parentNode.frame)
-                newLine.position = CGPoint(x: 2, y: -2)
+                label.horizontalAlignmentMode = .Left
+                label.verticalAlignmentMode = .Top
+                
+                //newLine.position = CGPointMake(parentNode.frame.width / 5 - 50, (parentNode.frame.height * 0.46) * -counter)
+                if counter == 0 {
+                    newLine.position = CGPoint(x: parentNode.frame.size.width / 5 - 50, y: (parentNode.frame.size.height * 0.30))
+                } else {
+                    newLine.position = CGPoint(x: parentNode.frame.size.width / 5 - 50, y: (labels[counter - 1].position.y - newLine.frame.size.height))
+                }
+                
+                
                 parentNode.addChild(newLine)
-                counter += 1
+                counter = counter + 1
+                labels.append(newLine)
             }
             
         } else {
-            
+            label.position = CGPointMake(parentNode.frame.width * -0.46, parentNode.frame.height * 0.46)
             parentNode.addChild(label)
             
         }
