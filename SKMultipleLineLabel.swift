@@ -15,9 +15,9 @@ class SKMultipleLineLabel: SKNode {
     var labels : [SKLabelNode] = []
     var fontSize : CGFloat = 20
     var fontColor : UIColor = UIColor.blackColor()
-    var parentNode : SKShapeNode
+    var parentNode : SKNode
     
-    init(parent : SKShapeNode, text : String="", font: String="Ariel"){
+    init(parent : SKNode, text : String="", font: String="Ariel"){
         //wondering if I need to keep. Brought in some of these for ease of modification
         self.text = text
         self.font = font
@@ -26,6 +26,7 @@ class SKMultipleLineLabel: SKNode {
         super.init()
         
         self.createMultiLineLabels()
+        self.displayLabels()
     }
     
     //req init
@@ -40,12 +41,10 @@ class SKMultipleLineLabel: SKNode {
     func createMultiLineLabels(){
         let label = SKLabelNode(fontNamed: font)
         label.text = text
-        label.fontSize = 15
-        label.fontColor = UIColor.blueColor()
         
-        let parWidth = parentNode.frame.width
+        let parWidth = parentNode.frame.size.width
         if label.frame.width > parWidth {
-            var widthOver = parentNode.frame.width - label.frame.width
+            var widthOver = parentNode.frame.size.width - label.frame.size.width
             
             if widthOver < 0 {
                 widthOver = widthOver * -1
@@ -66,7 +65,7 @@ class SKMultipleLineLabel: SKNode {
                 if text.frame.width < parWidth  && lineWidth < parWidth{
                     tempLine = "\(tempLine) \(word)"
                     words?.removeFirst()
-                    lineWidth = lineWidth + SKLabelNode(text: tempLine as String).frame.width
+                    lineWidth = lineWidth + SKLabelNode(text: tempLine as String).frame.size.width
                     
                     //only call this on the last line since most likely it will fall in this if
                     if words!.count == 0{
@@ -90,36 +89,39 @@ class SKMultipleLineLabel: SKNode {
                 
             }
             
-            var counter  = 0
-            
             for line in tempLineList {
                 
                 let newLine = SKLabelNode(text: line)
-//                newLine.verticalAlignmentMode = .Top
-//                newLine.horizontalAlignmentMode = .Left
-//                newLine.position = CGPointMake(parentNode., parentNode.frame)
-                label.horizontalAlignmentMode = .Left
-                label.verticalAlignmentMode = .Top
-                
-                //newLine.position = CGPointMake(parentNode.frame.width / 5 - 50, (parentNode.frame.height * 0.46) * -counter)
-                if counter == 0 {
-                    newLine.position = CGPoint(x: parentNode.frame.size.width / 5 - 50, y: (parentNode.frame.size.height * 0.30))
-                } else {
-                    newLine.position = CGPoint(x: parentNode.frame.size.width / 5 - 50, y: (labels[counter - 1].position.y - newLine.frame.size.height))
-                }
-                
-                
-                parentNode.addChild(newLine)
-                counter = counter + 1
+
                 labels.append(newLine)
             }
             
         } else {
-            label.position = CGPointMake(parentNode.frame.width * -0.46, parentNode.frame.height * 0.46)
-            parentNode.addChild(label)
+            label.position = CGPointMake(parentNode.frame.size.width * -0.46, parentNode.frame.size.height * 0.46)
+            labels.append(label)
             
         }
+    }
+    
+    func displayLabels(){
         
+        var counter = 0
+        for label in labels {
+            label.horizontalAlignmentMode = .Left
+            label.verticalAlignmentMode = .Top
+            label.fontSize = 30
+            label.fontColor = UIColor.blackColor()
+            label.zPosition = 2
+            
+            if counter == 0 {
+                label.position = CGPoint(x: CGRectGetMinX(parentNode.frame) + 10, y: (parentNode.frame.size.height / -2  - 20))
+            } else {
+                label.position = CGPoint(x: CGRectGetMinX(parentNode.frame) + 10, y: (labels[counter - 1].position.y - label.frame.size.height))
+            }
+            
+            parentNode.addChild(label)
+            counter += 1
+        }
         
         
     }
